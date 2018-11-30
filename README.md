@@ -1,0 +1,3 @@
+# docker-nextcloud-optimized
+Docker nextCloud Optimized Container Set (docker-compose)  
+Docker를 삭제하면서 남겨진 Data; 삭제하기 아까워서...
