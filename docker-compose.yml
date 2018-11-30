@@ -1,0 +1,60 @@
+version: "3.7"
+
+volumes:
+  nextcloud-root:
+  mariadb-root:
+  config-storage:
+
+services:
+  mariadb:
+    image: mariadb
+    restart: always
+    volumes:
+      - mariadb-root:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_PASSWORD=
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+
+  redis:
+    image: redis:latest
+    restart: always
+
+  nextcloud:
+    image: nextcloud:fpm
+    volumes:
+      - nextcloud-root:/var/www/html
+      - d:/:/media
+    restart: always
+    links:
+      - mariadb
+      - redis
+
+  php-fpm-webase1:
+    image: jungin500/php7.2-fpm:latest
+    restart: always
+    volumes:
+      - nextcloud-root:/var/www/html
+      - d:/:/media
+
+  nginx-webase1:
+    image: nginx
+    ports:
+      - 22401:443
+    volumes:
+      - config-storage:/etc/nginx
+      - nextcloud-root:/var/www/html
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: always
+    links:
+      - nextcloud
+      - php-fpm-webase1:php-fpm
+
+  phpmyadmin-webase2:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 22402:80
+    links:
+      - mariadb:db
